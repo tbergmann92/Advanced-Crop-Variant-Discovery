@@ -14,7 +14,7 @@ directionDic = {}
 
 # try open the multiFASTA
 try:
-    multiFASTA=open("Brassica_60k_Sequences_Complete.txt", "r")
+    multiFASTA=open("Brassica_60k_Sequences_Complete.fasta", "r")
 except IOError:
     print("Check the input file!")
     sys.exit(1)

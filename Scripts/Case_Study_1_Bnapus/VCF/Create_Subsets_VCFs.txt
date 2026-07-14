@@ -1,0 +1,64 @@
+### Merge the interval VCFs into one VCF
+### NOTE: ensure the tbi is up-to-date!!!
+
+# create list for merging
+ls *.vcf.gz | sort -V > vcfs.list
+
+# use bcftools to concat vcfs
+bcftools concat -a -Oz \
+	-o Samples_Bna_Minicore_1-135.merged.raw.vcf.gz \
+	-f vcfs.list
+	
+# index the merged VCF
+bcftools index -t Samples_Bna_Minicore_1-135.merged.raw.vcf.gz	
+
+# summary statistics with GATK
+gatk --java-options "-Xmx4g" VariantEval \
+	-R $REF \
+	-eval Samples_Bna_Minicore_1-135.merged.raw.vcf.gz \
+	-O Samples_Bna_Minicore_1-135.merged.raw.eval.report
+	
+# select biallelic SNPs
+gatk --java-options "-Xmx4g" SelectVariants \
+	-R $REF \
+	-V Samples_Bna_Minicore_1-135.merged.raw.vcf.gz \
+	--select-type-to-include SNP \
+	--restrict-alleles-to BIALLELIC \
+	-O Samples_Bna_Minicore_1-135.merged.raw.SNPs.vcf.gz
+
+# index
+bcftools index -t Samples_Bna_Minicore_1-135.merged.raw.SNPs.vcf.gz --threads 12
+	
+# retrieve all SNP positions
+bcftools query -f '%CHROM\t%POS\n' \
+	Samples_Bna_Minicore_1-135.merged.raw.SNPs.vcf.gz > all_snps_positions.txt
+
+# random subset
+shuf -n 1000000 all_snps_positions.txt | sort -k1,1 -k2,2n > subset_position.1M.sorted.txt
+
+# check distribution of random subset
+awk '{print $1}' subset_position.1M.sorted.txt | sort | uniq -c
+
+# create the subset
+bcftools view -T subset_position.1M.sorted.txt \
+	Samples_Bna_Minicore_1-135.merged.raw.SNPs.vcf.gz \
+	-Oz -o Samples_Bna_Minicore_1-135.subset.raw.SNPs.vcf.gz
+
+# index
+bcftools index -t Samples_Bna_Minicore_1-135.subset.raw.SNPs.vcf.gz
+
+# remove genotype sites to reduce file size (recommended)
+bcftools view -G \
+	Samples_Bna_Minicore_1-135.subset.raw.SNPs.vcf.gz \
+	-Oz -o Samples_Bna_Minicore_1-135.subset.raw.SNPs.sites.vcf.gz
+
+# index
+bcftools index -t Samples_Bna_Minicore_1-135.subset.raw.SNPs.sites.vcf.gz
+
+# create TRUTH_SET
+bcftools query -f '%CHROM\t%POS\n' known_sites_DarmorV10.sorted.vcf.gz > known_sites_positions.txt
+bcftools view -T known_sites_positions.txt Samples_Bna_Minicore_1-135.merged.raw.SNPs.vcf.gz -Oz -o Samples_Bna_Minicore_1-135.TRUTH_SET.vcf.gz
+
+# get distribution
+bcftools query -f '%CHROM\t' Samples_Bna_Minicore_1-135.TRUTH_SET.vcf.gz | sort -V | uniq -c
+
