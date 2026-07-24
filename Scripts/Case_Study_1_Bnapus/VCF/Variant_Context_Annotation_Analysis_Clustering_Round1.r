@@ -98,57 +98,6 @@ Truth_Set_SNP_Distribution <- data.frame(
   Count = as.numeric(table(Truth_Set_Annos$CHROM))
 )
 
-# Color scheme
-vir_19 <- viridis(n = 19)
-epsilon <- 1e-6
-
-## Plot the SNP distribution
-
-# Function for plotting the SNP counts across the chromosomes
-
-plot_Distribution <- function(dataframe, chrom_col, limits_vec, breaks_seq, header) {
-	ggplot(dataframe, aes(x = Chromosome, y = Count, fill = Chromosome)) +
-	geom_bar(stat = "identity", position = position_dodge(width = 0.8)) +
-	scale_fill_manual(values = chrom_col) +
-	scale_y_continuous(expand = c(0,0), limits = limits_vec, breaks = breaks_seq, labels=scales::number_format(accuracy = 1))+
-	labs(title = header,
-		y = "Number of SNPs",
-		x = "Chromosome",
-		fill = "Chromosome") +
-	theme(
-		plot.title = element_text(colour = "black", size = 16, face = "bold", hjust = 0.5),
-		axis.title.x = element_text(colour = "black", size = 14, face = "bold"),
-		axis.title.y = element_text(colour = "black", size = 14, face = "bold"),
-		axis.text.x = element_text(colour = "black", size = 14, face = "bold"),
-		axis.text.y = element_text(colour = "black", size = 14, face = "bold"),
-		legend.position = "none",
-		legend.title = element_text(face = "bold", size = 12),
-		legend.text = element_text(size = 12)
- )
-}
-
-# Define variables for both sets
-limits_subset <- c(0,100000)
-breaks_subset <- seq(0,100000,50000)
-header_subset <- "Distribution of Clustering Subset (1M SNPs) in Darmor-bzh (v.10)"
-
-limits_truth <- c(0,3500)
-breaks_truth <- seq(0,3000,500)
-header_truth <- "Distribution of Truth Set (33k) in Darmor-bzh (v.10)"
-
-# Create the plots
-Distribution_Subset <- plot_Distribution(Subset_SNP_Distribution, vir_19, limits_subset, breaks_subset, header_subset)
-Distribution_Truth <- plot_Distribution(Truth_Set_SNP_Distribution, vir_19, limits_truth, breaks_truth, header_truth)
-	
-## Combine plots
-Distribution_SNPs_per_Chromosomes <- cowplot::plot_grid(Distribution_Subset, 
-														Distribution_Truth,
-														nrow=2, ncol=1, align="hv", scale = 0.9,
-														labels=c("A","B"), label_size = 28)
-#png("./Figures/Distribution_SNPs_Truth_vs_Clustering_Subset_Darmor.png", width=4000, height=4000, res=350)
-Distribution_SNPs_per_Chromosomes
-#dev.off()
-
 # Set different scales for the annotations
 QD_breaks <- c(0,10,20,30,40)
 QD_limits <- c(0,50)
@@ -203,79 +152,6 @@ plot_density <- function(data, var, threshold, breaks, limits, label, chrom_var 
   )
 )
 }
-
-# Plot QD context annotation for all sets across chromosomes
-QD_Plot_Subset <- plot_density(Clustering_Subset_Annos, "QD", 2, QD_breaks, QD_limits, "QualByDepth [Clustering Subset]", show_legend = TRUE)
-QD_Plot_Truth <- plot_density(Truth_Set_Annos, "QD", 2, QD_breaks, QD_limits, "QualByDepth [Truth Set]")
-
-## Combine in one plot
-QD_Plots <- cowplot::plot_grid(QD_Plot_Subset, QD_Plot_Truth, 
-							   nrow=2, ncol=1, align="hv", 
-							   labels = c("A", "B"), label_size = 26)
-#png("./Figures/QD_Plot_Truth_vs_Subset_Darmor.png", width=4000, height=5000, res=300)
-QD_Plots
-#dev.off()
-
-# Plot FS context annotation for all sets
-FS_Plot_Subset <- plot_density(Clustering_Subset_Annos, "log_FS", 4.1, logFS_breaks, logFS_limits, "log(FisherStrand) [Clustering Subset]", show_legend = TRUE)
-FS_Plot_Truth <- plot_density(Truth_Set_Annos, "log_FS", 4.1, logFS_breaks, logFS_limits, "log(FisherStrand) [Truth Set]")
-
-## Combine in one plot
-FS_Plots <- cowplot::plot_grid(FS_Plot_Subset, FS_Plot_Truth, 
-							   nrow=2, ncol=1, align="hv", 
-							   labels = c("A", "B"), label_size = 26)
-#png("./Figures/FS_Plot_Truth_vs_Subset_Darmor.png", width=4000, height=5000, res=300)
-FS_Plots
-#dev.off()
-
-# Plot SOR context annotation for all sets
-SOR_Plot_Subset <- plot_density(Clustering_Subset_Annos, "SOR", 3.0, SOR_breaks, SOR_limits, "StrandOddsRatio [Clustering Subset]", show_legend = TRUE)
-SOR_Plot_Truth <- plot_density(Truth_Set_Annos, "SOR", 3.0, SOR_breaks, SOR_limits, "StrandOddsRatio [Truth Set]")
-
-## Combine in one plot
-SOR_Plots <- cowplot::plot_grid(SOR_Plot_Subset, SOR_Plot_Truth, 
-							   nrow=2, ncol=1, align="hv", 
-							   labels = c("A", "B"), label_size = 26)
-#png("./Figures/SOR_Plot_Truth_vs_Subset_Darmor.png", width=4000, height=5000, res=300)
-SOR_Plots
-#dev.off()
-
-# Plot MQ context annotation for all sets
-MQ_Plot_Subset <- plot_density(Clustering_Subset_Annos, "MQ", 40.0, MQ_breaks, MQ_limits, "MappingQuality [Clustering Subset]", show_legend = TRUE)
-MQ_Plot_Truth <- plot_density(Truth_Set_Annos, "MQ", 40.0, MQ_breaks, MQ_limits, "MappingQuality [Truth Set]")
-
-## Combine in one plot
-MQ_Plots <- cowplot::plot_grid(MQ_Plot_Subset, MQ_Plot_Truth, 
-							   nrow=2, ncol=1, align="hv", 
-							   labels = c("A", "B"), label_size = 26)
-#png("./Figures/MQ_Plot_Truth_vs_Subset_Darmor.png", width=4000, height=5000, res=300)
-MQ_Plots
-#dev.off()
-
-# Plot MQRS context annotation for all sets
-MQRS_Plot_Subset <- plot_density(Clustering_Subset_Annos, "MQRankSum", -12.5, MQRS_breaks, MQRS_limits, "MQRankSum [Clustering Subset]", show_legend = TRUE)
-MQRS_Plot_Truth <- plot_density(Truth_Set_Annos, "MQRankSum", -12.5, MQRS_breaks, MQRS_limits, "MQRankSum [Truth Set]")
-
-## Combine in one plot
-MQRS_Plots <- cowplot::plot_grid(MQRS_Plot_Subset, MQRS_Plot_Truth, 
-							   nrow=2, ncol=1, align="hv", 
-							   labels = c("A", "B"), label_size = 26)
-#png("./Figures/MQRS_Plot_Truth_vs_Subset_Darmor.png", width=4000, height=5000, res=300)
-MQRS_Plots
-#dev.off()
-
-# Plot RPRS context annotation for all sets
-RPRS_Plot_Subset <- plot_density(Clustering_Subset_Annos, "ReadPosRankSum", -8, RPRS_breaks, RPRS_limits, "ReadPosRankSum [Clustering Subset]", show_legend = TRUE)
-RPRS_Plot_Truth <- plot_density(Truth_Set_Annos, "ReadPosRankSum", -8, RPRS_breaks, RPRS_limits, "ReadPosRankSum [Truth Set]")
-
-## Combine in one plot
-RPRS_Plots <- cowplot::plot_grid(RPRS_Plot_Subset, RPRS_Plot_Truth, 
-							   nrow=2, ncol=1, align="hv", 
-							   labels = c("A", "B"), label_size = 26)
-#png("./Figures/RPRS_Plot_Truth_vs_Subset_Darmor.png", width=4000, height=5000, res=300)
-RPRS_Plots
-#dev.off()
-
 
 ## Combine data frames for joint plotting
 Clustering_Subset_Annos$Dataset <- "Clustering Subset"
@@ -332,11 +208,6 @@ MQ_Plot_Global <- plot_global_density(Combined_Annos, "MQ", 40.0, MQ_breaks, MQ_
 MQRS_Plot_Global <- plot_global_density(Combined_Annos, "MQRankSum", -12.5, MQRS_breaks, MQRS_limits, "MQRankSum [MQRS]", show_legend = FALSE)
 RPRS_Plot_Global <- plot_global_density(Combined_Annos, "ReadPosRankSum", -8, RPRS_breaks, RPRS_limits, "ReadPosRankSum [RPRS]", show_legend = FALSE)
 
-#png("./Figures/QD_Plot_Global.png", width=4000, height=2000, res=300)
-QD_Plot_Global
-#dev.off()
-
-
 ## Combine in one plot
 Global_Distribution_Plots <- cowplot::plot_grid(QD_Plot_Global, FS_Plot_Global,
 												SOR_Plot_Global, MQ_Plot_Global,
@@ -347,24 +218,7 @@ Global_Distribution_Plots <- cowplot::plot_grid(QD_Plot_Global, FS_Plot_Global,
 Global_Distribution_Plots
 #dev.off()
 
-Global_Distribution_Plots_1_3 <- cowplot::plot_grid(QD_Plot_Global, FS_Plot_Global,
-												SOR_Plot_Global,
-												nrow=3, ncol=1, align="hv", scale = 0.95,
-												labels = c("AUTO"), label_size = 26)
-#png("./Figures/Global_Distribution_Plots_1_3.png", width=3000, height=3800, res=300)
-Global_Distribution_Plots_1_3
-#dev.off()
-
-Global_Distribution_Plots_4_6 <- cowplot::plot_grid(MQ_Plot_Global, MQRS_Plot_Global,
-												RPRS_Plot_Global,
-												nrow=3, ncol=1, align="hv", 
-												labels = c("AUTO"), label_size = 22)
-#png("./Figures/Global_Distribution_Plots_4_6.png", width=3500, height=4500, res=300)
-Global_Distribution_Plots_4_6
-#dev.off()
-
 ### Variant Context Annotation Clustering
-## Retrieve some summary statistics
 
 # Label according to hard filtering
 Clustering_Subset <- Clustering_Subset %>%
@@ -484,76 +338,6 @@ plot_Subset <- Clustering_Subset %>%
 table(plot_Subset$Category)
 #  FAIL   PASS  TRUTH 
 #358132 640481   1387
-		
-# Prepare DF for plotting
-plot_Subset <- plot_Subset %>%
-  pivot_longer(
-    cols = c(QD, FS, MQ, SOR, MQRankSum, ReadPosRankSum),
-    names_to = "Annotation",
-    values_to = "Value"
-  ) %>%
-  mutate(Annotation = as.factor(Annotation))
-
-# Set levels
-Annotation_levels <- c("QD", "FS", "SOR", "MQ", "MQRankSum", "ReadPosRankSum")
-plot_Subset$Annotation <- factor(plot_Subset$Annotation, levels = Annotation_levels)
-
-plot_Subset$Category <- factor(
-  plot_Subset$Category,
-  levels = c("FAIL", "PASS", "TRUTH")
-)
-
-# Prepare GATK thresholds
-GATK_Thresholds <- data.frame(
-  Annotation = c("QD", "FS", "SOR", "MQ", "MQRankSum", "ReadPosRankSum"),
-  Threshold = c(2.0, 60.0, 3.0, 40.0, -12.5, -8.0)
-)
-
-GATK_Thresholds$Annotation <- factor(
-  GATK_Thresholds$Annotation,
-  levels = c("QD", "FS", "SOR", "MQ", "MQRankSum", "ReadPosRankSum")
-)
-
-# Create the boxplots for the annotations
-#png("./Figures/Boxplots_Variant_Context_Annotations.png", width=4500, height=3500, res=350)
-ggplot(plot_Subset,
-       aes(x = Category,
-           y = Value,
-           fill = Category)) +
-  geom_boxplot(
-    position = position_dodge(width = 0.8),
-    outlier.size = 0.3
-  ) +
-  geom_hline(
-    data = GATK_Thresholds,
-    aes(yintercept = Threshold),
-    color = "red",
-    linetype = "dashed",
-    linewidth = 1
-  ) +
-  scale_fill_manual(
-	name = "Category",
-	values = c("#F8766D", "#00BFC4", "#7CAE00")) +
-  facet_wrap(~ Annotation, scales = "free", labeller = labeller(Annotation = c("QD" = "QualByDepth",
-																			   "FS" = "FisherStrand",
-																			   "SOR" = "StrandOddsRatio",
-																			   "MQ" = "MappingQuality",
-																			   "MQRankSum" = "MQRankSum",
-																			   "ReadPosRankSum" = "ReadPosRankSum"))) +
-  theme(
-    plot.title = element_text(size = 16, face = "bold", hjust = 0.5, color = "black"),
-    #axis.title.x = element_text(size = 14, face = "bold", color = "black"),
-    axis.title.x = element_blank(),
-	axis.title.y = element_text(size = 14, face = "bold", color = "black"),
-    axis.text.x  = element_text(size = 14, face = "bold", color = "black"),
-    axis.text.y  = element_text(size = 14, face = "bold", color = "black"),
-    strip.text   = element_text(size = 16, color = "black"),
-    legend.position = c(0.95,0.92),
-	legend.background = element_blank(), 
-    legend.title = element_text(face = "bold", size = 14, color = "black"),
-    legend.text  = element_text(size = 14, color = "black")
-  )
-#dev.off()
 
 #####################################################################
 ############################ PART 2 #################################
@@ -607,8 +391,6 @@ PCA_Subset <- na.omit(Clustering_Subset[Subset_idx, ])
 # Select scaled annotation columns for PCA
 Annotations <- c("QD_scaled", "FS_scaled", "SOR_scaled", 
                  "MQ_scaled", "MQRankSum_scaled", "ReadPosRankSum_scaled")
-Annotations5 <- c("QD_scaled", "SOR_scaled", 
-                 "MQ_scaled", "MQRankSum_scaled", "ReadPosRankSum_scaled")
 		 
 # Check NAs
 colSums(is.na(PCA_Subset[, Annotations]))	 
@@ -617,14 +399,10 @@ colSums(is.na(PCA_Subset[, Annotations]))
 PCA_res6_Subset <- prcomp(PCA_Subset[, Annotations], 
 				  center = FALSE, scale. = FALSE)
 
-# Run PCA on normalized data (five annotations)
-PCA_res5_Subset <- prcomp(PCA_Subset[, Annotations5], 
-				  center = FALSE, scale. = FALSE)
-
 # Scree Plots
 Scree_Plot_Subset <- fviz_eig(PCA_res6_Subset,
 	addlabels=TRUE, hjust = 0.5, ylim = c(0,40),
-	main = "Clustering Subset (Sampled: n = 103,172)",
+	main = "Clustering Subset (Sampled: n = 103,185)",
 	ggtheme = theme(
     plot.title = element_text(colour = "black", size = 12, face = "bold", hjust = 0.5),
     axis.title.x = element_text(colour = "black", size = 12, face = "bold"),
@@ -636,28 +414,6 @@ Scree_Plot_Subset <- fviz_eig(PCA_res6_Subset,
     legend.text = element_text(size = 12)
   )) +
   scale_y_continuous(expand=c(0,0))
-
-Scree_Plot_Subset_5_Annotations <- fviz_eig(PCA_res5_Subset,
-	addlabels=TRUE, hjust = 0.5, ylim = c(0,40),
-	main = "Clustering Subset (Sampled: n = 103,172, Annotations = 5)",
-	ggtheme = theme(
-    plot.title = element_text(colour = "black", size = 12, face = "bold", hjust = 0.5),
-    axis.title.x = element_text(colour = "black", size = 12, face = "bold"),
-    axis.title.y = element_text(colour = "black", size = 12, face = "bold"),
-    axis.text.x = element_text(colour = "black", size = 12, face = "bold"),
-    axis.text.y = element_text(colour = "black", size = 12, face = "bold"),
-    legend.position = "right",
-    legend.title = element_text(face = "bold", size = 12),
-    legend.text = element_text(size = 12)
-  )) +
-  scale_y_continuous(expand=c(0,0))
-
-# Plot all together
-Scree_Plots_Annotations <- cowplot::plot_grid(Scree_Plot_Subset, Scree_Plot_Subset_5_Annotations,
-													nrow=1, ncol=2, align="hv", labels = "AUTO", label_size = 18)
-#png("./Figures/Scree_Plots_Annotations_Darmor.png", width=3500, height=2000, res=300)
-Scree_Plots_Annotations
-#dev.off()
 
 #png("./Figures/Scree_Plot_6Annotations_Darmor.png", width=2500, height=2000, res=300)
 Scree_Plot_Subset
@@ -712,21 +468,12 @@ Biplot_6Annos_Subset_PC2_PC3 <- fviz_pca_var(PCA_res6_Subset, axes = c(2,3),
 						legend.text = element_text(size = 12)
 				))
 
-
 Biplots_6Annotations_Subset <- cowplot::plot_grid(Biplot_6Annos_Subset_PC1_PC2, Biplot_6Annos_Subset_PC2_PC3,
 												      Biplot_6Annos_Subset_PC1_PC3,
 													  nrow=3, ncol=1, align="hv", labels = c("A","B","C"),
 													  label_size = 18, scale = 1)
 #png("./Figures/Biplots_6Annotations_Subset.png", width=2000, height=3500, res=300)
 Biplots_6Annotations_Subset
-#dev.off()
-
-#Biplots_6Annotations_Subset_Horizontal <- cowplot::plot_grid(Biplot_6Annos_Subset_PC1_PC2, Biplot_6Annos_Subset_PC2_PC3,
-#												      Biplot_6Annos_Subset_PC1_PC3,
-#													  nrow=1, ncol=3, align="hv", labels = c("A","B","C"),
-#													  label_size = 18, scale = 1)
-#png("./Figures/Biplots_6Annotations_Subset_Horizontal.png", width=4500, height=1500, res=300)
-#Biplots_6Annotations_Subset_Horizontal
 #dev.off()
 
 # Check significance for FS and SOR
@@ -768,9 +515,7 @@ cor_matrix_heatmap_subset <- Heatmap(cor_matrix_subset, col=coul,
     )
   }
 )
-#png("./Figures/Corr_plots_Darmor.png", width = 2500, height = 2000, res = 300)
 cor_matrix_heatmap_subset
-#dev.off()
 
 #####################################################################
 ############################ PART 3 #################################
@@ -808,18 +553,6 @@ count_hf_violations <- function(df, thresholds) {
 
 # Summarise HF violations row-wise and add to dataframe
 Clustering_Subset <- count_hf_violations(Clustering_Subset, GATK_Thresholds_List)
-
-# Generic function to print tables
-hf_violation_table <- function(df, cluster_col) {
-  clusters <- unique(df[[cluster_col]])
-
-  for (cl in clusters) {
-    cat("\n### Cluster:", cl, "\n")
-    print(
-      table(df[df[[cluster_col]] == cl, ]$HF_Violations)
-    )
-  }
-}
 
 ### Clustering analysis
 
@@ -885,22 +618,8 @@ DeltaBIC_SubsetPlot <- ggplot(GMM_deltaBIC_Subset, aes(x = Clusters, y = Delta_B
   )
 DeltaBIC_SubsetPlot
 
-#png("./Figures/DeltaBIC_Plot_Subset_Clustering.png", width=3000, height=2000, res=300)
-DeltaBIC_SubsetPlot
-#dev.off()
+## Set up the model 
 
-## Set up the models and run them across the subsets 
-
-# two cluster
-GMM_K2_Subset <- GMM(
-	data = Opt_Cluster_Subset,
-	gaussian_comps = 2,
-	dist_mode = "maha_dist",
-	seed_mode = "random_subset",
-	km_iter = 10,
-	em_iter = 100,
-	var_floor = 1e-10
-	)
 # three cluster
 GMM_K3_Subset <- GMM(
 	data = Opt_Cluster_Subset,
@@ -914,11 +633,6 @@ GMM_K3_Subset <- GMM(
 
 # --- Predict cluster memberships ---
 
-# for two cluster
-pred_GMM_K2_Subset <- predict_GMM(Opt_Cluster_Subset, 
-								   GMM_K2_Subset$centroids, 
-								   GMM_K2_Subset$covariance_matrices,
-								   GMM_K2_Subset$weights)
 # for three cluster
 pred_GMM_K3_Subset <- predict_GMM(Opt_Cluster_Subset, 
 								   GMM_K3_Subset$centroids, 
@@ -928,7 +642,6 @@ pred_GMM_K3_Subset <- predict_GMM(Opt_Cluster_Subset,
 # --- Add predictions to the main dataset ---
 Clustering_Subset_Complete <- Clustering_Subset_Complete %>%
   mutate(
-    GMM_K2 = as.factor(pred_GMM_K2_Subset$cluster_labels),
     GMM_K3 = as.factor(pred_GMM_K3_Subset$cluster_labels),
   )
 
@@ -936,27 +649,6 @@ Clustering_Subset_Complete <- Clustering_Subset_Complete %>%
 PCA_GMM_Labelled_Subset <- PCA_Subset %>%
   left_join(Clustering_Subset_Complete %>% select(VariantID, starts_with("GMM")),
             by = "VariantID")
-
-table(Clustering_Subset_Complete$GMM_K2)
-#     1      2 
-#511778 385401
-
-# Check where truth variants fall (k = 2)
-table(Clustering_Subset_Complete$GMM_K2, Clustering_Subset_Complete$is_truth)
-#     FALSE   TRUE
-#  1 510465   1313
-#  2 385339     62
-
-# Summarize metrics for k = 2
-K2_GMM_Subset_Summary <- Clustering_Subset_Complete %>%
-  group_by(GMM_K2) %>%
-  summarise(across(QD:ReadPosRankSum, \(x) median(x, na.rm = TRUE)))  
-print(K2_GMM_Subset_Summary)
-# A tibble: 2 × 7
-#  GMM_K2    QD    FS   SOR    MQ MQRankSum ReadPosRankSum
-#  <fct>  <dbl> <dbl> <dbl> <dbl>     <dbl>          <dbl>
-#1 1      18.8   1.22  0.71  56.6    -0.807          0.132
-#2 2       5.97 22.1   2.77  53      -2.89           0.069
 
 table(Clustering_Subset_Complete$GMM_K3)
 #     1      2      3 
@@ -1001,20 +693,12 @@ print(HF_Subset_Summary)
 #1 Bad            4   19.6  3.26   46.6     -2.11          0.047
 #2 Good          18.2  2.51 0.791  56.6     -1.52          0.131
 
-
 # Label clusters
-Clustering_Subset_Complete$GMM_K2 <- factor(
-  Clustering_Subset_Complete$GMM_K2,
-  levels = c(1, 2),
-  labels = c("Good", "Bad")
-)
-
 Clustering_Subset_Complete$GMM_K3 <- factor(
   Clustering_Subset_Complete$GMM_K3,
   levels = c(1, 2, 3),
   labels = c("Bad", "Good", "Medium")
 )
-
 
 ## Add probabilities of GMM K3 to dataframe
 Clustering_Subset_Complete$GMM_K3_Good <- pred_GMM_K3_Subset$cluster_proba[, 2]
@@ -1026,17 +710,16 @@ Clustering_Subset_Complete$GMM_K3_Bad <- pred_GMM_K3_Subset$cluster_proba[, 1]
 
 # Prepare dataframes
 Subset_Alluvial_GMM <- Clustering_Subset_Complete %>%
-  select(VariantID, hardfiltered, GMM_K2, GMM_K3) %>%
+  select(VariantID, hardfiltered, GMM_K3) %>%
   mutate(
 	hardfiltered = factor(hardfiltered, levels = c("Good", "Bad")),
-	GMM_K2 = factor(GMM_K2, levels = c("Good", "Bad")),
 	GMM_K3 = factor(GMM_K3, levels = c("Good", "Medium", "Bad"))
 	) %>%
-	dplyr::count(hardfiltered, GMM_K2, GMM_K3, name = "freq")
+	dplyr::count(hardfiltered, GMM_K3, name = "freq")
 
 Subset_Alluvial_GMM <- Subset_Alluvial_GMM %>%
   mutate(across(
-    c(hardfiltered, GMM_K2, GMM_K3),
+    c(hardfiltered, GMM_K3),
     ~ factor(recode(.,
       "Good" = "High",
       "Medium" = "Intermediate",
@@ -1048,18 +731,17 @@ Subset_Alluvial_GMM <- Subset_Alluvial_GMM %>%
 
 # Color palette
 my_colors <- c(
-  "High"   = "#66C2A5",
-  "Intermediate" = "#8DA0CB",
-  "Low"    = "#FC8D62"
+  "High"   = "#0E7175",
+  "Intermediate" = "#808BC5",
+  "Low"    = "#ED773C"
 )	
 
 # Alluvial plot
-Alluvial_Plot_Subset <- ggplot(
+Alluvial_Plot_Subset_Two_Comparison <- ggplot(
   Subset_Alluvial_GMM,
   aes(
     axis1 = hardfiltered,
-    axis2 = GMM_K2,
-    axis3 = GMM_K3,
+    axis2 = GMM_K3,
     y     = freq
   )
 ) +
@@ -1070,10 +752,10 @@ Alluvial_Plot_Subset <- ggplot(
   #  aes(label = after_stat(stratum)),
   #  size = 4
   #) +
-  scale_fill_manual(values = my_colors, name = "Annotation Profile") +
+  scale_fill_manual(values = my_colors, name = "Variant Quality Class") +
   scale_x_discrete(
-    limits = c("hardfiltered", "GMM_K2", "GMM_K3"),
-    labels = c("Hard Filters", "GMM (k = 2)", "GMM (k = 3)")
+    limits = c("hardfiltered", "GMM_K3"),
+    labels = c("Hard Filters", "GMM (k = 3)")
   ) +
   scale_y_continuous(
     labels = scales::label_number(big.mark=","),
@@ -1100,51 +782,53 @@ Alluvial_Plot_Subset <- ggplot(
 	plot.margin = margin(t = 5, r = 5, b = 5, l = 5)
   )
 
-#png("./Figures/Alluvial_Plots_HF_GMM.png", width=3500, height=2000, res=350)
-Alluvial_Plot_Subset
-#dev.off()
-
 ### plot best model fit and alluvial plots together
 Model_Output <- cowplot::plot_grid(DeltaBIC_SubsetPlot,
-									  Alluvial_Plot_Subset,
+									  Alluvial_Plot_Subset_Two_Comparison,
 									  nrow=1, ncol=2, align = "hv",
 									  scale = 0.99, labels="AUTO", label_size=24)
-#png("./Figures/Model_Output.png", width=4500, height=2000, res=300)
+#png("./Figures/Model_Output.png", width=6500, height=3000, res=350)
 Model_Output
 #dev.off()
 
-
 #take the same random subset that was used for PCA
 Clustering_Subset_PCA <- PCA_Subset %>%
-  left_join(Clustering_Subset_Complete %>% select(VariantID, GMM_K2, GMM_K3),
+  left_join(Clustering_Subset_Complete %>% select(VariantID, GMM_K3),
             by = "VariantID") %>%
-  mutate(across(
-	c(hardfiltered, GMM_K2, GMM_K3),
-		~factor(recode(.,
+  mutate(hardfiltered = factor(
+			recode(hardfiltered,
+			"Good" = "PASS",
+			"Bad" = "FAIL"
+		),
+		levels = c("PASS", "FAIL"))
+	) %>%
+  mutate(GMM_K3 = factor(
+			recode(GMM_K3,
 			"Good" = "High",
 			"Medium" = "Intermediate",
 			"Bad" = "Low"
 		),
 		levels = c("High", "Intermediate", "Low"))
-	))
+	)
 
-# Biplots for k = 2 clustering
+# Color palette
+my_colors <- c("#0E7175","#ED773C")	
 
-### ### GMM Clustering
-Biplot_Ind_Var_K2_GMM_PC1_PC2 <- fviz_pca_biplot(PCA_res6_Subset, axes = c(1,2),
+# Biplots for hard filtering
+Biplot_Ind_Var_HF_PC1_PC2 <- fviz_pca_biplot(PCA_res6_Subset, axes = c(1,2),
     geom.ind = "point",
-    habillage = Clustering_Subset_PCA$GMM_K2,
+    habillage = Clustering_Subset_PCA$hardfiltered,
     addEllipses = TRUE,
 	ellipse.level = 0.95,
-	title = "GMM [k = 2; n = 103,172)",
+	title = "Hard Filtering [n = 103,185]",
 	col.var="black",
-    palette = "Set2",
+    palette = my_colors,
 	repel = TRUE,        # <-- Important!
     labelsize = 3,       # reduce label size
     pointsize = 1.5) +
-	labs(color = "Annotation Profile",
-		 shape = "Annotation Profile",
-		 fill = "Annotation Profile") +
+	labs(color = "Hard Filtering",
+		 shape = "Hard Filtering",
+		 fill = "Hard Filtering") +
 theme_gray(base_size = 14) +
 theme(
 	plot.title = element_text(colour = "black", size = 16, face = "bold", hjust = 0.5),
@@ -1152,19 +836,19 @@ theme(
 	axis.title.y = element_text(colour = "black", size = 14, face = "bold"),
 	axis.text.x = element_text(colour = "black", size = 14, face = "bold"),
 	axis.text.y = element_text(colour = "black", size = 14, face = "bold"),
-	legend.position = c(0.8,0.2),
+	legend.position = c(0.75,0.2),
 	legend.background = element_blank(),
 	legend.title = element_text(face = "bold", size = 14),
 	legend.text = element_text(size = 14))
 
-Biplot_Ind_Var_K2_GMM_PC1_PC3 <- fviz_pca_biplot(PCA_res6_Subset, axes = c(1,3),
+Biplot_Ind_Var_HF_PC1_PC3 <- fviz_pca_biplot(PCA_res6_Subset, axes = c(1,3),
     geom.ind = "point",
-    habillage = Clustering_Subset_PCA$GMM_K2,
+    habillage = Clustering_Subset_PCA$hardfiltered,
     addEllipses = TRUE,
 	ellipse.level = 0.95,
-	title = "GMM [k = 2; n = 103,172)",
+	title = " ",
 	col.var="black",
-    palette = "Set2",
+    palette = my_colors,
 	repel = TRUE,        # <-- Important!
     labelsize = 3,       # reduce label size
     pointsize = 1.5) +
@@ -1179,14 +863,14 @@ theme(
 	legend.title = element_text(face = "bold", size = 14),
 	legend.text = element_text(size = 14))
 
-Biplot_Ind_Var_K2_GMM_PC2_PC3 <- fviz_pca_biplot(PCA_res6_Subset, axes = c(2,3),
+Biplot_Ind_Var_HF_PC2_PC3 <- fviz_pca_biplot(PCA_res6_Subset, axes = c(2,3),
     geom.ind = "point",
-    habillage = Clustering_Subset_PCA$GMM_K2,
+    habillage = Clustering_Subset_PCA$hardfiltered,
     addEllipses = TRUE,
 	ellipse.level = 0.95,
-	title = "GMM [k = 2; n = 103,172)",
+	title = " ",
 	col.var="black",
-    palette = "Set2",
+    palette = my_colors,
 	repel = TRUE,        # <-- Important!
     labelsize = 3,       # reduce label size
     pointsize = 1.5) +
@@ -1204,26 +888,26 @@ theme(
 # Biplots for k = 3 clustering
 
 my_colors <- c(
-  "High" = "#66C2A5",
-  "Intermediate" = "#8DA0CB",
-  "Low" = "#FC8D62"
-)
+  "High"   = "#0E7175",
+  "Intermediate" = "#808BC5",
+  "Low"    = "#ED773C"
+)	
 
-### ### GMM Clustering
+### GMM Clustering
 Biplot_Ind_Var_K3_GMM_PC1_PC2 <- fviz_pca_biplot(PCA_res6_Subset, axes = c(1,2),
     geom.ind = "point",
     habillage = Clustering_Subset_PCA$GMM_K3,
     addEllipses = TRUE,
 	ellipse.level = 0.95,
-	title = "GMM [k = 3; n = 103,172)",
+	title = "GMM [k = 3; n = 103,185]",
 	col.var="black",
     palette = my_colors,
 	repel = TRUE,        # <-- Important!
     labelsize = 3,       # reduce label size
     pointsize = 1.5) +
-	labs(color = "Annotation Profile",
-		 shape = "Annotation Profile",
-		 fill = "Annotation Profile") +
+	labs(color = "Variant Quality Class",
+		 shape = "Variant Quality Class",
+		 fill = "Variant Quality Class") +
 theme_gray(base_size = 14) +
 theme(
 	plot.title = element_text(colour = "black", size = 16, face = "bold", hjust = 0.5),
@@ -1231,7 +915,7 @@ theme(
 	axis.title.y = element_text(colour = "black", size = 14, face = "bold"),
 	axis.text.x = element_text(colour = "black", size = 14, face = "bold"),
 	axis.text.y = element_text(colour = "black", size = 14, face = "bold"),
-	legend.position = c(0.77,0.2),
+	legend.position = c(0.72,0.2),
 	legend.background = element_blank(),
 	legend.title = element_text(face = "bold", size = 14),
 	legend.text = element_text(size = 14))
@@ -1241,7 +925,7 @@ Biplot_Ind_Var_K3_GMM_PC1_PC3 <- fviz_pca_biplot(PCA_res6_Subset, axes = c(1,3),
     habillage = Clustering_Subset_PCA$GMM_K3,
     addEllipses = TRUE,
 	ellipse.level = 0.95,
-	title = "GMM [k = 3; n = 103,172)",
+	title = " ",
 	col.var="black",
     palette = my_colors,
 	repel = TRUE,        # <-- Important!
@@ -1263,7 +947,7 @@ Biplot_Ind_Var_K3_GMM_PC2_PC3 <- fviz_pca_biplot(PCA_res6_Subset, axes = c(2,3),
     habillage = Clustering_Subset_PCA$GMM_K3,
     addEllipses = TRUE,
 	ellipse.level = 0.95,
-	title = "GMM [k = 3; n = 103,172)",
+	title = " ",
 	col.var="black",
     palette = my_colors,
 	repel = TRUE,        # <-- Important!
@@ -1281,92 +965,21 @@ theme(
 	legend.text = element_text(size = 14))	
 
 ## Plot all together in one common plot (vertically):
-Biplots_Var_Ind_GMM <- cowplot::plot_grid(Biplot_Ind_Var_K2_GMM_PC1_PC2, Biplot_Ind_Var_K3_GMM_PC1_PC2,
-										 Biplot_Ind_Var_K2_GMM_PC2_PC3, Biplot_Ind_Var_K3_GMM_PC2_PC3,
-										 Biplot_Ind_Var_K2_GMM_PC1_PC3, Biplot_Ind_Var_K3_GMM_PC1_PC3,
+Biplots_Var_Ind_GMM <- cowplot::plot_grid(Biplot_Ind_Var_HF_PC1_PC2, Biplot_Ind_Var_K3_GMM_PC1_PC2,
+										 Biplot_Ind_Var_HF_PC2_PC3, Biplot_Ind_Var_K3_GMM_PC2_PC3,
+										 Biplot_Ind_Var_HF_PC1_PC3, Biplot_Ind_Var_K3_GMM_PC1_PC3,
 										 nrow=3, ncol=2, align="hv", labels = c("A","D","B","E","C","F"),
 										 label_size = 20)
-#png("./Figures/Biplots_Var_Ind_GMM.png",  width=4000, height=5000, res=350)
+#png("./Figures/Biplots_Var_Ind_HF_vs_GMM.png",  width=4000, height=5000, res=350)
 Biplots_Var_Ind_GMM
 #dev.off()
 
-## Plot all together in one common plot (horizontally):
-#Biplots_Var_Ind_GMM_Horizontal <- cowplot::plot_grid(Biplot_Ind_Var_K2_GMM_PC1_PC2, Biplot_Ind_Var_K2_GMM_PC2_PC3,
-#										 Biplot_Ind_Var_K2_GMM_PC1_PC3, Biplot_Ind_Var_K3_GMM_PC1_PC2,
-#										 Biplot_Ind_Var_K3_GMM_PC2_PC3, Biplot_Ind_Var_K3_GMM_PC1_PC3,
-#										 nrow=2, ncol=3, align="hv", labels = c("A","B","C","D","E","F"),
-#										 label_size = 20)
-#png("./Figures/Biplots_Var_Ind_GMM_Horizontal.png",  width=5000, height=3000, res=350)
-#Biplots_Var_Ind_GMM_Horizontal
-#dev.off()
-
-
-## Reduce to the GMM K3 data
-GMM_Subset  <- Clustering_Subset_Complete[,c(1:17,19:22)] 
-
-# Understanding the structure of the clusters
-features <- c("QD", "MQ", "FS", "SOR", "MQRankSum", "ReadPosRankSum")
-
-GMM_Subset_long <- GMM_Subset %>%
-  pivot_longer(cols = all_of(features), names_to = "Feature", values_to = "Value")
-
-GMM_Subset_long$Feature <- factor(
-  GMM_Subset_long$Feature,
-  levels = c("QD", "FS", "SOR", "MQ", "MQRankSum", "ReadPosRankSum")
-)
-
-GMM_Subset_long$GMM_K3 <- factor(
-  GMM_Subset_long$GMM_K3,
-  levels = c("Good", "Medium", "Bad")
-)
-
-Thresholds <- data.frame(
-  Feature = c("QD", "FS", "SOR", "MQ", "MQRankSum", "ReadPosRankSum"),
-  Threshold = c(2.0, 60.0, 3.0, 40.0, -12.5, -8.0)
-)
-
-Thresholds$Feature <- factor(
-  Thresholds$Feature,
-  levels = c("QD", "FS", "SOR", "MQ", "MQRankSum", "ReadPosRankSum")
-)
-
-GMM_K3_Clustering_Metrics <- ggplot(GMM_Subset_long, aes(x = GMM_K3, y = Value, fill = GMM_K3)) +
-  geom_boxplot(outlier.alpha = 0.2) +
-  geom_hline(data = Thresholds,
-             aes(yintercept = Threshold, group = Feature),
-             color = "red",
-             linetype = "dashed") +
-  facet_wrap(~ Feature, scales = "free_y") +
-  theme_bw(base_size = 13) +
-  scale_fill_manual(name = "Cluster", values = c("Good" = "#66C2A5", "Medium" = "#8DA0CB", "Bad" = "#FC8D62")) +
-  labs(
-    title = "Distribution of Annotation Features per GMM (k = 3) Cluster",
-    x = "Cluster",
-    y = "Annotation Value"
-  )+
-  theme_gray(base_size = 14) +
-  theme(
-    plot.title = element_text(colour = "black", size = 16, face = "bold", hjust = 0.5),
-    plot.subtitle = element_text(size = 13, hjust = 0.5),
-    axis.title.x = element_text(colour = "black", size = 14, face = "bold"),
-    axis.title.y = element_text(colour = "black", size = 14, face = "bold"),
-    axis.text.x = element_text(colour = "black", size = 13, face = "bold"),
-    axis.text.y = element_text(colour = "black", size = 13, face = "bold"),
-	strip.text = element_text(size=14, face="bold"),
-    legend.position = "right",
-    legend.title = element_text(face = "bold", size = 12),
-    legend.text = element_text(size = 12)
-	)
-#png("./Figures/GMM_K3_Clustering_Metrics.png", width=4000, height=3000, res=350)
-GMM_K3_Clustering_Metrics
-#dev.off()
-
 # check the correlation among the annotations and the probs
-cor_vars <- GMM_Subset %>%
+cor_vars <- Clustering_Subset_Complete %>%
   select(QD, FS, MQ, SOR, MQRankSum, ReadPosRankSum, GMM_K3_Good, GMM_K3_Med, GMM_K3_Bad) %>%
   cor(use="pairwise.complete.obs")
 
-cor.test(GMM_Subset$FS, GMM_Subset$GMM_K3_Bad, alternative="greater", method="pearson", conf.level = 0.95)
+cor.test(Clustering_Subset_Complete$FS, Clustering_Subset_Complete$GMM_K3_Bad, alternative="greater", method="pearson", conf.level = 0.95)
 #        Pearson's product-moment correlation
 #
 #data:  GMM_Subset$FS and GMM_Subset$GMM_K3_Bad
@@ -1378,7 +991,7 @@ cor.test(GMM_Subset$FS, GMM_Subset$GMM_K3_Bad, alternative="greater", method="pe
 #      cor 
 #0.5608894
 
-cor.test(GMM_Subset$SOR, GMM_Subset$GMM_K3_Bad, alternative="greater", method="pearson", conf.level = 0.95)
+cor.test(Clustering_Subset_Complete$SOR, Clustering_Subset_Complete$GMM_K3_Bad, alternative="greater", method="pearson", conf.level = 0.95)
 #        Pearson's product-moment correlation
 #
 #data:  GMM_Subset$SOR and GMM_Subset$GMM_K3_Bad
@@ -1392,7 +1005,6 @@ cor.test(GMM_Subset$SOR, GMM_Subset$GMM_K3_Bad, alternative="greater", method="p
 
 coul <- circlize::colorRamp2(c(1,0.5,0,-0.5,-1),c("#172869FF","#088BBEFF","#F1F4EEFF","#E9A17CFF","#803233FF"))
 
-#png("./Figures/Heatmap_Correlation_Annotations_Probs_Subset.png", width=3000, height=2500, res=350)
 cor_vars_heatmap <- Heatmap(cor_vars, col=coul,
 								  show_row_names=TRUE,
 								  row_dend_width=unit(4,"cm"),
@@ -1418,15 +1030,14 @@ cor_vars_heatmap <- Heatmap(cor_vars, col=coul,
   }
 )
 cor_vars_heatmap
-#dev.off()
 
-GMM_Subset$GMM_K3 <- factor(
-  GMM_Subset$GMM_K3,
+Clustering_Subset_Complete$GMM_K3 <- factor(
+  Clustering_Subset_Complete$GMM_K3,
   levels = c("Good", "Medium", "Bad")
 )
 
 ## Run a multinomial/ordinal logistic regression to identify the features 
-model <- multinom(GMM_K3 ~ QD + FS + MQ + SOR + MQRankSum + ReadPosRankSum, data = GMM_Subset, Hess=TRUE)
+model <- multinom(GMM_K3 ~ QD + FS + MQ + SOR + MQRankSum + ReadPosRankSum, data = Clustering_Subset_Complete, Hess=TRUE)
 # weights:  24 (14 variable)
 #initial  value 985651.874551 
 #iter  10 value 619473.521690
@@ -1460,8 +1071,6 @@ exp(coef(model))
 #Medium 3.110139e+130 0.9597348 0.995848 0.006477648   0.6801846 0.7180525      1.0510465
 #Bad    1.634382e+125 0.9199871 2.104721 0.006231244 158.4369983 0.8232283      0.8125521
 
-
-
 #####################################################################
 ############################ PART 4 #################################
 #####################################################################
@@ -1469,25 +1078,25 @@ exp(coef(model))
 ### Constructing a training set
 
 ## Stratify good variants
-good_strat1_prob <- GMM_Subset %>%
+good_strat1_prob <- Clustering_Subset_Complete %>%
 				   filter(GMM_K3 == "Good" &
 						  GMM_K3_Good >= 0.0 & GMM_K3_Good <= 0.25)
-good_strat2_prob <- GMM_Subset %>%
+good_strat2_prob <- Clustering_Subset_Complete %>%
 				   filter(GMM_K3 == "Good" &
 						  GMM_K3_Good >= 0.25 & GMM_K3_Good <= 0.5)
-good_strat3_prob <- GMM_Subset %>%
+good_strat3_prob <- Clustering_Subset_Complete %>%
 				   filter(GMM_K3 == "Good" &
 						  GMM_K3_Good >= 0.5 & GMM_K3_Good <= 0.6)
-good_strat4_prob <- GMM_Subset %>%
+good_strat4_prob <- Clustering_Subset_Complete %>%
 				   filter(GMM_K3 == "Good" &
 						  GMM_K3_Good >= 0.6 & GMM_K3_Good <= 0.7)
-good_strat5_prob <- GMM_Subset %>%
+good_strat5_prob <- Clustering_Subset_Complete %>%
 				   filter(GMM_K3 == "Good" &
 						  GMM_K3_Good >= 0.7 & GMM_K3_Good <= 0.8)
-good_strat6_prob <- GMM_Subset %>%
+good_strat6_prob <- Clustering_Subset_Complete %>%
 				   filter(GMM_K3 == "Good" &
 						  GMM_K3_Good >= 0.8 & GMM_K3_Good <= 0.9)
-good_strat7_prob <- GMM_Subset %>%
+good_strat7_prob <- Clustering_Subset_Complete %>%
 				   filter(GMM_K3 == "Good" &
 						  GMM_K3_Good >= 0.9)
 
@@ -1615,7 +1224,6 @@ Good_Strats$Metric <- factor(
   levels = c("QD", "FS", "SOR", "MQ", "MQRankSum", "ReadPosRankSum")
 )
 
-#png("./Figures/Boxplots_Good_Probs_Stratification.png", width=5000, height=3000, res=300)
 Annotation_Metrics_Good_Probs_Stratification <- ggplot(Good_Strats, aes(Good_Prob, Value, fill=Good_Prob)) +
   geom_boxplot(outlier.size=0.3) +
   geom_hline(data = GATK_Thresholds,
@@ -1638,28 +1246,27 @@ Annotation_Metrics_Good_Probs_Stratification <- ggplot(Good_Strats, aes(Good_Pro
     legend.text = element_text(size = 12)
 	)
 Annotation_Metrics_Good_Probs_Stratification
-#dev.off()
 
 ## Stratify medium variants
-medium_strat1_prob <- GMM_Subset %>%
+medium_strat1_prob <- Clustering_Subset_Complete %>%
 				   filter(GMM_K3 == "Medium" &
 						  GMM_K3_Med >= 0.0 & GMM_K3_Med <= 0.25)
-medium_strat2_prob <- GMM_Subset %>%
+medium_strat2_prob <- Clustering_Subset_Complete %>%
 				   filter(GMM_K3 == "Medium" &
 						  GMM_K3_Med >= 0.25 & GMM_K3_Med <= 0.5)
-medium_strat3_prob <- GMM_Subset %>%
+medium_strat3_prob <- Clustering_Subset_Complete %>%
 				   filter(GMM_K3 == "Medium" &
 						  GMM_K3_Med >= 0.5 & GMM_K3_Med <= 0.6)
-medium_strat4_prob <- GMM_Subset %>%
+medium_strat4_prob <- Clustering_Subset_Complete %>%
 				   filter(GMM_K3 == "Medium" &
 						  GMM_K3_Med >= 0.6 & GMM_K3_Med <= 0.7)
-medium_strat5_prob <- GMM_Subset %>%
+medium_strat5_prob <- Clustering_Subset_Complete %>%
 				   filter(GMM_K3 == "Medium" &
 						  GMM_K3_Med >= 0.7 & GMM_K3_Med <= 0.8)
-medium_strat6_prob <- GMM_Subset %>%
+medium_strat6_prob <- Clustering_Subset_Complete %>%
 				   filter(GMM_K3 == "Medium" &
 						  GMM_K3_Med >= 0.8 & GMM_K3_Med <= 0.9)
-medium_strat7_prob <- GMM_Subset %>%
+medium_strat7_prob <- Clustering_Subset_Complete %>%
 				   filter(GMM_K3 == "Medium" &
 						  GMM_K3_Med >= 0.9)
 ## Check metrics
@@ -1778,7 +1385,6 @@ Medium_Strats$Metric <- factor(
   levels = c("QD", "FS", "SOR", "MQ", "MQRankSum", "ReadPosRankSum")
 )
 
-#png("./Figures/Boxplots_Med_Probs_Stratification.png", width=5000, height=3000, res=300)
 Annotation_Metrics_Medium_Probs_Stratification <- ggplot(Medium_Strats, aes(Medium_Prob, Value, fill=Medium_Prob)) +
   geom_boxplot(outlier.size=0.3) +
   geom_hline(data = GATK_Thresholds,
@@ -1801,28 +1407,27 @@ Annotation_Metrics_Medium_Probs_Stratification <- ggplot(Medium_Strats, aes(Medi
     legend.text = element_text(size = 12)
 	)
 Annotation_Metrics_Medium_Probs_Stratification
-#dev.off()
 
 ## Stratify bad variants
-bad_strat1_prob <- GMM_Subset %>%
+bad_strat1_prob <- Clustering_Subset_Complete %>%
 				   filter(GMM_K3 == "Bad" &
 						  GMM_K3_Bad >= 0.0 & GMM_K3_Bad <= 0.25)
-bad_strat2_prob <- GMM_Subset %>%
+bad_strat2_prob <- Clustering_Subset_Complete %>%
 				   filter(GMM_K3 == "Bad" &
 						  GMM_K3_Bad >= 0.25 & GMM_K3_Bad <= 0.5)
-bad_strat3_prob <- GMM_Subset %>%
+bad_strat3_prob <- Clustering_Subset_Complete %>%
 				   filter(GMM_K3 == "Bad" &
 						  GMM_K3_Bad >= 0.5 & GMM_K3_Bad <= 0.6)
-bad_strat4_prob <- GMM_Subset %>%
+bad_strat4_prob <- Clustering_Subset_Complete %>%
 				   filter(GMM_K3 == "Bad" &
 						  GMM_K3_Bad >= 0.6 & GMM_K3_Bad <= 0.7)
-bad_strat5_prob <- GMM_Subset %>%
+bad_strat5_prob <- Clustering_Subset_Complete %>%
 				   filter(GMM_K3 == "Bad" &
 						  GMM_K3_Bad >= 0.7 & GMM_K3_Bad <= 0.8)
-bad_strat6_prob <- GMM_Subset %>%
+bad_strat6_prob <- Clustering_Subset_Complete %>%
 				   filter(GMM_K3 == "Bad" &
 						  GMM_K3_Bad >= 0.8 & GMM_K3_Bad <= 0.9)
-bad_strat7_prob <- GMM_Subset %>%
+bad_strat7_prob <- Clustering_Subset_Complete %>%
 				   filter(GMM_K3 == "Bad" &
 						  GMM_K3_Bad >= 0.9)
 
@@ -1942,7 +1547,6 @@ Bad_Strats$Metric <- factor(
   levels = c("QD", "FS", "SOR", "MQ", "MQRankSum", "ReadPosRankSum")
 )
 
-#png("./Figures/Boxplots_Bad_Probs_Stratification.png", width=5000, height=3000, res=300)
 Annotation_Metrics_Bad_Probs_Stratification <- ggplot(Bad_Strats, aes(Bad_Prob, Value, fill=Bad_Prob)) +
   geom_boxplot(outlier.size=0.3) +
   geom_hline(data = GATK_Thresholds,
@@ -1965,26 +1569,15 @@ Annotation_Metrics_Bad_Probs_Stratification <- ggplot(Bad_Strats, aes(Bad_Prob, 
     legend.text = element_text(size = 12)
 	)
 Annotation_Metrics_Bad_Probs_Stratification
-#dev.off()
-
-#png("./Figures/All_Annotation_Metrics_Strats.png",  width=3000, height=6000, res=300)
-All_Annotation_Metrics_Strats <- cowplot::plot_grid(Annotation_Metrics_Good_Probs_Stratification,
-													Annotation_Metrics_Medium_Probs_Stratification,
-													Annotation_Metrics_Bad_Probs_Stratification,
-													nrow = 3, ncol = 1, align="hv", labels="AUTO",
-													label_size = 20)
-All_Annotation_Metrics_Strats
-#dev.off()
-
 
 ### Prepare the training data set
 
 ## Filter good variants
-VQSR_training_good <- GMM_Subset %>%
+VQSR_training_good <- Clustering_Subset_Complete %>%
 	filter(GMM_K3 == "Good" & GMM_K3_Good >= 0.8)
 
 ## Filter medium variants
-VQSR_training_medium <- GMM_Subset %>%
+VQSR_training_medium <- Clustering_Subset_Complete %>%
 	filter(GMM_K3 == "Medium" & GMM_K3_Med >= 0.7)
 
 ## Summary: good
