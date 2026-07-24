@@ -24,7 +24,7 @@ library(ggalluvial)
 library(viridisLite)  # load package
 
 ### Set path
-setwd("C:/Users/00115569/OneDrive - UWA/GATK_Pipeline/Wild_Brassica/VCF/Round_1")
+setwd("PATH/TO/VCF/")
 
 #####################################################################
 ############################ PART 1 #################################
@@ -98,15 +98,9 @@ Truth_Set_SNP_Distribution <- data.frame(
   Count = as.numeric(table(Truth_Set_Annos$CHROM))
 )
 
-# Color scheme
-vir_19 <- viridis(n = 19)
-epsilon <- 1e-6
-
 # Set different scales for the annotations
 QD_breaks <- c(0,10,20,30,40)
 QD_limits <- c(0,50)
-logDP_breaks <- c(0,2,4,6,8,10,12)
-logDP_limits <- c(0,13)
 logFS_breaks <- c(-1,0,2,4)
 logFS_limits <- c(-2,6)
 MQ_breaks <- c(0,10,20,30,40,50,60)
@@ -778,80 +772,6 @@ Clustering_Subset_PCA <- PCA_Subset %>%
 		levels = c("High", "Intermediate", "Low"))
 	)
 
-# Color palette
-my_colors <- c("#0E7175","#ED773C")	
-
-# Biplots for hard filtering
-Biplot_Ind_Var_HF_PC1_PC2 <- fviz_pca_biplot(PCA_res6_Subset, axes = c(1,2),
-    geom.ind = "point",
-    habillage = Clustering_Subset_PCA$hardfiltered,
-    addEllipses = TRUE,
-	ellipse.level = 0.95,
-	title = "Hard Filtering [n = 106,427]",
-	col.var="black",
-    palette = my_colors,
-	repel = TRUE,        # <-- Important!
-    labelsize = 3,       # reduce label size
-    pointsize = 1.5) +
-	labs(color = "Hard Filtering",
-		 shape = "Hard Filtering",
-		 fill = "Hard Filtering") +
-theme_gray(base_size = 14) +
-theme(
-	plot.title = element_text(colour = "black", size = 16, face = "bold", hjust = 0.5),
-	axis.title.x = element_text(colour = "black", size = 14, face = "bold"),
-	axis.title.y = element_text(colour = "black", size = 14, face = "bold"),
-	axis.text.x = element_text(colour = "black", size = 14, face = "bold"),
-	axis.text.y = element_text(colour = "black", size = 14, face = "bold"),
-	legend.position = c(0.75,0.2),
-	legend.background = element_blank(),
-	legend.title = element_text(face = "bold", size = 14),
-	legend.text = element_text(size = 14))
-
-Biplot_Ind_Var_HF_PC1_PC3 <- fviz_pca_biplot(PCA_res6_Subset, axes = c(1,3),
-    geom.ind = "point",
-    habillage = Clustering_Subset_PCA$hardfiltered,
-    addEllipses = TRUE,
-	ellipse.level = 0.95,
-	title = " ",
-	col.var="black",
-    palette = my_colors,
-	repel = TRUE,        # <-- Important!
-    labelsize = 3,       # reduce label size
-    pointsize = 1.5) +
-theme_gray(base_size = 14) +
-theme(
-	plot.title = element_text(colour = "black", size = 16, face = "bold", hjust = 0.5),
-	axis.title.x = element_text(colour = "black", size = 14, face = "bold"),
-	axis.title.y = element_text(colour = "black", size = 14, face = "bold"),
-	axis.text.x = element_text(colour = "black", size = 14, face = "bold"),
-	axis.text.y = element_text(colour = "black", size = 14, face = "bold"),
-	legend.position = "none",
-	legend.title = element_text(face = "bold", size = 14),
-	legend.text = element_text(size = 14))
-
-Biplot_Ind_Var_HF_PC2_PC3 <- fviz_pca_biplot(PCA_res6_Subset, axes = c(2,3),
-    geom.ind = "point",
-    habillage = Clustering_Subset_PCA$hardfiltered,
-    addEllipses = TRUE,
-	ellipse.level = 0.95,
-	title = " ",
-	col.var="black",
-    palette = my_colors,
-	repel = TRUE,        # <-- Important!
-    labelsize = 3,       # reduce label size
-    pointsize = 1.5) +
-theme_gray(base_size = 14) +
-theme(
-	plot.title = element_text(colour = "black", size = 16, face = "bold", hjust = 0.5),
-	axis.title.x = element_text(colour = "black", size = 14, face = "bold"),
-	axis.title.y = element_text(colour = "black", size = 14, face = "bold"),
-	axis.text.x = element_text(colour = "black", size = 14, face = "bold"),
-	axis.text.y = element_text(colour = "black", size = 14, face = "bold"),
-	legend.position = "none",
-	legend.title = element_text(face = "bold", size = 14),
-	legend.text = element_text(size = 14))	
-
 # Biplots for k = 3 clustering
 
 my_colors <- c(
@@ -882,7 +802,7 @@ theme(
 	axis.title.y = element_text(colour = "black", size = 14, face = "bold"),
 	axis.text.x = element_text(colour = "black", size = 14, face = "bold"),
 	axis.text.y = element_text(colour = "black", size = 14, face = "bold"),
-	legend.position = c(0.72,0.2),
+	legend.position = c(0.8,0.2),
 	legend.background = element_blank(),
 	legend.title = element_text(face = "bold", size = 14),
 	legend.text = element_text(size = 14))
@@ -931,15 +851,17 @@ theme(
 	legend.title = element_text(face = "bold", size = 14),
 	legend.text = element_text(size = 14))	
 
-## Plot all together in one common plot (vertically):
-Biplots_Var_Ind_GMM <- cowplot::plot_grid(Biplot_Ind_Var_HF_PC1_PC2, Biplot_Ind_Var_K3_GMM_PC1_PC2,
-										 Biplot_Ind_Var_HF_PC2_PC3, Biplot_Ind_Var_K3_GMM_PC2_PC3,
-										 Biplot_Ind_Var_HF_PC1_PC3, Biplot_Ind_Var_K3_GMM_PC1_PC3,
-										 nrow=3, ncol=2, align="hv", labels = c("A","D","B","E","C","F"),
+## Plot all together in one common plot (horizontally):
+Biplots_Var_Ind_HF_vs_GMM_Horizontal <- cowplot::plot_grid(
+										 Biplot_Ind_Var_K3_GMM_PC1_PC2,
+										 Biplot_Ind_Var_K3_GMM_PC2_PC3, 
+										 Biplot_Ind_Var_K3_GMM_PC1_PC3,
+										 nrow=3, ncol=1, align="hv", labels = c("A","B","C"),
 										 label_size = 20)
-#png("./Figures/Biplots_Var_Ind_HF_vs_GMM.png",  width=4000, height=5000, res=350)
-Biplots_Var_Ind_GMM
+#png("./Figures/Biplots_Var_Ind_GMM.png",  width=2500, height=4500, res=350)
+Biplots_Var_Ind_HF_vs_GMM_Horizontal
 #dev.off()
+
 
 # check the correlation among the annotations and the probs
 cor_vars <- Clustering_Subset_Complete %>%
